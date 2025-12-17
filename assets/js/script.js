@@ -76,7 +76,12 @@ function closeEditUserModal() {
 function openDeleteModal(id) {
   const modal = document.getElementById("deleteModal");
   if (modal) {
-    document.getElementById("deletePengaduanId").value = id;
+    const pengaduanIdInput = document.getElementById("deletePengaduanId");
+    const userIdInput = document.getElementById("delete_id");
+
+    if (pengaduanIdInput) pengaduanIdInput.value = id;
+    if (userIdInput) userIdInput.value = id;
+
     modal.classList.add("active");
     document.body.style.overflow = "hidden";
   }

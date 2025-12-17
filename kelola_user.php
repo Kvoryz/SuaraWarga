@@ -488,6 +488,6 @@ $result_masyarakat = mysqli_query($conn, $query_masyarakat);
         </div>
     </div>
     
-    <script src="assets/js/script.js"></script>
+    <script src="assets/js/script.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>
