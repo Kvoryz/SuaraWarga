@@ -4,7 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once 'config/function.php';
 
-// Hanya admin yang bisa akses
 if (!isset($_SESSION['user_id']) || $_SESSION['level'] != 'admin') {
     header("Location: login.php");
     exit();
@@ -17,11 +16,9 @@ $user_email = $_SESSION['email'];
 
 date_default_timezone_set('Asia/Makassar');
 
-// Filter
 $filter_type = isset($_GET['type']) ? $_GET['type'] : 'semua';
 $filter_date = isset($_GET['date']) ? $_GET['date'] : '';
 
-// Query untuk pengaduan baru
 $query_pengaduan = "SELECT 
     p.id_pengaduan,
     p.tanggal_pengaduan,
@@ -37,7 +34,6 @@ if ($filter_date) {
     $query_pengaduan .= " WHERE p.tanggal_pengaduan = '$filter_date'";
 }
 
-// Query untuk user baru
 $query_users = "SELECT 
     id,
     nama,
@@ -52,7 +48,6 @@ if ($filter_date) {
     $query_users .= " WHERE DATE(created_at) = '$filter_date'";
 }
 
-// Query untuk tanggapan
 $query_tanggapan = "SELECT 
     t.id_tanggapan,
     t.tanggal_tanggapan,
@@ -68,12 +63,10 @@ if ($filter_date) {
     $query_tanggapan .= " WHERE t.tanggal_tanggapan = '$filter_date'";
 }
 
-// Ambil data
 $result_pengaduan = mysqli_query($conn, $query_pengaduan);
 $result_users = mysqli_query($conn, $query_users);
 $result_tanggapan = mysqli_query($conn, $query_tanggapan);
 
-// Gabungkan semua aktivitas
 $activities = [];
 
 while ($row = mysqli_fetch_assoc($result_pengaduan)) {
@@ -114,19 +107,16 @@ while ($row = mysqli_fetch_assoc($result_tanggapan)) {
     ];
 }
 
-// Filter berdasarkan tipe
 if ($filter_type != 'semua') {
     $activities = array_filter($activities, function($item) use ($filter_type) {
         return $item['tipe'] == $filter_type;
     });
 }
 
-// Sort berdasarkan waktu (terbaru dulu)
 usort($activities, function($a, $b) {
     return strtotime($b['waktu']) - strtotime($a['waktu']);
 });
 
-// Statistik
 $total_pengaduan = mysqli_num_rows(mysqli_query($conn, "SELECT id_pengaduan FROM pengaduan"));
 $total_users = mysqli_num_rows(mysqli_query($conn, "SELECT id FROM users"));
 $total_tanggapan = mysqli_num_rows(mysqli_query($conn, "SELECT id_tanggapan FROM tanggapan"));
@@ -150,12 +140,20 @@ $user_hari_ini = mysqli_num_rows(mysqli_query($conn, "SELECT id FROM users WHERE
     <?php include 'layout/navbar.php'; ?>
     
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Activity Logs</h1>
-            <p class="text-gray-600">Pantau semua aktivitas terbaru di sistem</p>
+        <div class="mb-8 flex justify-between items-start">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Activity Logs</h1>
+                <p class="text-gray-600">Pantau semua aktivitas terbaru di sistem</p>
+            </div>
+            <a href="export_logs.php?type=<?php echo $filter_type; ?>&date=<?php echo $filter_date; ?>" 
+               class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Export CSV
+            </a>
         </div>
         
-        <!-- Statistik Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-xl border border-gray-200 p-6">
                 <div class="flex items-center justify-between">
@@ -216,7 +214,6 @@ $user_hari_ini = mysqli_num_rows(mysqli_query($conn, "SELECT id FROM users WHERE
             </div>
         </div>
         
-        <!-- Filter -->
         <div class="bg-white rounded-xl border border-gray-200 p-6 mb-8">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Filter Aktivitas</h2>
             <form method="GET" action="" class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -251,7 +248,6 @@ $user_hari_ini = mysqli_num_rows(mysqli_query($conn, "SELECT id FROM users WHERE
             </form>
         </div>
         
-        <!-- Activity Timeline -->
         <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div class="border-b border-gray-200 px-6 py-4">
                 <div class="flex justify-between items-center">
@@ -267,10 +263,9 @@ $user_hari_ini = mysqli_num_rows(mysqli_query($conn, "SELECT id FROM users WHERE
                 <?php 
                 $count = 0;
                 foreach ($activities as $activity): 
-                    if ($count >= 50) break; // Batasi 50 aktivitas terakhir
+                    if ($count >= 50) break; 
                     $count++;
                     
-                    // Tentukan warna berdasarkan tipe
                     $icon_bg = '';
                     $icon_color = '';
                     $icon_svg = '';
@@ -293,7 +288,6 @@ $user_hari_ini = mysqli_num_rows(mysqli_query($conn, "SELECT id FROM users WHERE
                             break;
                     }
                     
-                    // Format waktu
                     $waktu = strtotime($activity['waktu']);
                     $waktu_formatted = date('d M Y', $waktu);
                     $waktu_relative = '';
