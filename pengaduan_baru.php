@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ajukan_pengaduan'])) {
     
     $isi_laporan = mysqli_real_escape_string($conn, $_POST['isi_laporan']);
     $lokasi = mysqli_real_escape_string($conn, $_POST['lokasi']);
-    $tanggal_pengaduan = date('Y-m-d');
+    $tanggal_pengaduan = date('Y-m-d H:i:s');
     
     if (empty($isi_laporan)) {
         $error = "Isi laporan tidak boleh kosong";

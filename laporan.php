@@ -17,26 +17,31 @@ $user_email = $_SESSION['email'];
 $success = '';
 $error = '';
 
+date_default_timezone_set('Asia/Makassar');
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['tambah_tanggapan'])) {
     $id_pengaduan = mysqli_real_escape_string($conn, $_POST['id_pengaduan']);
     $tanggapan = mysqli_real_escape_string($conn, $_POST['tanggapan']);
     $status = mysqli_real_escape_string($conn, $_POST['status']);
-    $tanggal_tanggapan = date('Y-m-d');
+    $tanggal_tanggapan = date('Y-m-d H:i:s');
     
-    if (empty($tanggapan)) {
-        $error = "Isi tanggapan tidak boleh kosong";
-    } else {
-        $sql_tanggapan = "INSERT INTO tanggapan (id_pengaduan, tanggal_tanggapan, tanggapan, id_petugas) 
-                          VALUES ($id_pengaduan, '$tanggal_tanggapan', '$tanggapan', $user_id)";
-        
-        if (mysqli_query($conn, $sql_tanggapan)) {
-            $sql_status = "UPDATE pengaduan SET status = '$status' WHERE id_pengaduan = $id_pengaduan";
-            mysqli_query($conn, $sql_status);
+    $sql_status = "UPDATE pengaduan SET status = '$status' WHERE id_pengaduan = $id_pengaduan";
+    
+    if (mysqli_query($conn, $sql_status)) {
+        if (!empty($tanggapan)) {
+            $sql_tanggapan = "INSERT INTO tanggapan (id_pengaduan, tanggal_tanggapan, tanggapan, id_petugas) 
+                              VALUES ($id_pengaduan, '$tanggal_tanggapan', '$tanggapan', $user_id)";
             
-            $success = "Tanggapan berhasil ditambahkan dan status diperbarui";
+            if (mysqli_query($conn, $sql_tanggapan)) {
+                $success = "Status diperbarui dan tanggapan ditambahkan";
+            } else {
+                $error = "Status diperbarui, tapi gagal menambahkan tanggapan: " . mysqli_error($conn);
+            }
         } else {
-            $error = "Gagal menambahkan tanggapan: " . mysqli_error($conn);
+            $success = "Status pengaduan berhasil diperbarui";
         }
+    } else {
+        $error = "Gagal memperbarui status: " . mysqli_error($conn);
     }
 }
 
@@ -62,7 +67,6 @@ if (isset($_GET['hapus'])) {
     exit();
 }
 
-// Bulk delete handler
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['bulk_delete'])) {
     if ($user_level == 'admin' || $user_level == 'petugas') {
         if (isset($_POST['selected_ids']) && is_array($_POST['selected_ids']) && count($_POST['selected_ids']) > 0) {
@@ -581,10 +585,10 @@ $stats = mysqli_fetch_assoc($stats_result);
                     </div>
                     
                     <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Tanggapan Anda</label>
-                        <textarea name="tanggapan" id="tanggapan_text" required rows="6"
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tanggapan Anda (Opsional)</label>
+                        <textarea name="tanggapan" id="tanggapan_text" rows="6"
                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"
-                                  placeholder="Tuliskan tanggapan atau tindakan yang telah diambil..."></textarea>
+                                  placeholder="Tuliskan tanggapan atau tindakan yang telah diambil (opsional)..."></textarea>
                     </div>
                     
                     <div class="flex justify-end space-x-3">
