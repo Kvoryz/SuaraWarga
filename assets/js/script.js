@@ -63,7 +63,7 @@ function openEditModal() {
   const modal = document.getElementById("editModal");
   if (modal) {
     modal.classList.add("active");
-    document.body.classList.add("modal-open"); document.documentElement.classList.add("modal-open");
+    document.body.classList.add("modal-open");
   }
 }
 
@@ -71,7 +71,7 @@ function closeEditModal() {
   const modal = document.getElementById("editModal");
   if (modal) {
     modal.classList.remove("active");
-    document.body.classList.remove("modal-open"); document.documentElement.classList.remove("modal-open");
+    document.body.classList.remove("modal-open");
   }
 }
 
@@ -79,7 +79,7 @@ function openAddModal() {
   const modal = document.getElementById("addModal");
   if (modal) {
     modal.classList.add("active");
-    document.body.classList.add("modal-open"); document.documentElement.classList.add("modal-open");
+    document.body.classList.add("modal-open");
   }
 }
 
@@ -87,7 +87,7 @@ function closeAddModal() {
   const modal = document.getElementById("addModal");
   if (modal) {
     modal.classList.remove("active");
-    document.body.classList.remove("modal-open"); document.documentElement.classList.remove("modal-open");
+    document.body.classList.remove("modal-open");
   }
 }
 
@@ -102,7 +102,7 @@ function openEditUserModal(id, nama, email, username, telp, level) {
     document.getElementById("edit_level").value = level;
 
     modal.classList.add("active");
-    document.body.classList.add("modal-open"); document.documentElement.classList.add("modal-open");
+    document.body.classList.add("modal-open");
   }
 }
 
@@ -110,7 +110,7 @@ function closeEditUserModal() {
   const modal = document.getElementById("editModal");
   if (modal) {
     modal.classList.remove("active");
-    document.body.classList.remove("modal-open"); document.documentElement.classList.remove("modal-open");
+    document.body.classList.remove("modal-open");
   }
 }
 
@@ -124,7 +124,7 @@ function openDeleteModal(id) {
     if (userIdInput) userIdInput.value = id;
 
     modal.classList.add("active");
-    document.body.classList.add("modal-open"); document.documentElement.classList.add("modal-open");
+    document.body.classList.add("modal-open");
   }
 }
 
@@ -133,7 +133,7 @@ function hideDeleteModal() {
   if (modal) {
     modal.classList.remove("active");
     modal.classList.add("hidden");
-    document.body.classList.remove("modal-open"); document.documentElement.classList.remove("modal-open");
+    document.body.classList.remove("modal-open");
   }
 }
 
@@ -164,14 +164,14 @@ function confirmDeletePengaduan(id, pelapor, tanggal) {
   }
 
   modal.classList.add("active");
-  document.body.classList.add("modal-open"); document.documentElement.classList.add("modal-open");
+  document.body.classList.add("modal-open");
 }
 
 function closeDeleteModal() {
   const modal = document.getElementById("deleteModal");
   if (modal) {
     modal.classList.remove("active");
-    document.body.classList.remove("modal-open"); document.documentElement.classList.remove("modal-open");
+    document.body.classList.remove("modal-open");
   }
 }
 
@@ -302,7 +302,7 @@ function openDetailModal(
   }
 
   modal.classList.add("active");
-  document.body.classList.add("modal-open"); document.documentElement.classList.add("modal-open");
+  document.body.classList.add("modal-open");
 }
 
 function formatTanggal(dateStr) {
@@ -321,7 +321,7 @@ function closeDetailModal() {
   const modal = document.getElementById("detailModal");
   if (modal) {
     modal.classList.remove("active");
-    document.body.classList.remove("modal-open"); document.documentElement.classList.remove("modal-open");
+    document.body.classList.remove("modal-open");
   }
 }
 
@@ -332,7 +332,7 @@ function openTanggapanModal(id_pengaduan, currentStatus) {
     document.getElementById("tanggapan_status").value = currentStatus;
     document.getElementById("tanggapan_text").value = "";
     modal.classList.add("active");
-    document.body.classList.add("modal-open"); document.documentElement.classList.add("modal-open");
+    document.body.classList.add("modal-open");
   }
 }
 
@@ -340,7 +340,7 @@ function closeTanggapanModal() {
   const modal = document.getElementById("tanggapanModal");
   if (modal) {
     modal.classList.remove("active");
-    document.body.classList.remove("modal-open"); document.documentElement.classList.remove("modal-open");
+    document.body.classList.remove("modal-open");
   }
 }
 
@@ -371,14 +371,14 @@ function openDeleteModalLaporan(id, pelapor, tanggal) {
   }
 
   modal.classList.add("active");
-  document.body.classList.add("modal-open"); document.documentElement.classList.add("modal-open");
+  document.body.classList.add("modal-open");
 }
 
 function closeConfirmationModal() {
   const modal = document.getElementById("confirmationModal");
   if (modal) {
     modal.classList.remove("active");
-    document.body.classList.remove("modal-open"); document.documentElement.classList.remove("modal-open");
+    document.body.classList.remove("modal-open");
   }
 }
 
@@ -485,7 +485,7 @@ function openImageModal(filename) {
   if (modal) {
     document.getElementById("modalImage").src = "uploads/" + filename;
     modal.classList.remove("hidden");
-    document.body.classList.add("modal-open"); document.documentElement.classList.add("modal-open");
+    document.body.classList.add("modal-open");
   }
 }
 
@@ -493,7 +493,7 @@ function closeImageModal() {
   const modal = document.getElementById("imageModal");
   if (modal) {
     modal.classList.add("hidden");
-    document.body.classList.remove("modal-open"); document.documentElement.classList.remove("modal-open");
+    document.body.classList.remove("modal-open");
   }
 }
 
@@ -504,7 +504,7 @@ function showDeleteModal(pengaduanId) {
   if (modal) {
     modal.classList.remove("hidden");
     modal.classList.add("active");
-    document.body.classList.add("modal-open"); document.documentElement.classList.add("modal-open");
+    document.body.classList.add("modal-open");
   }
 }
 
