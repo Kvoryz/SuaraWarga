@@ -132,22 +132,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ajukan_pengaduan'])) {
                                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                                 <div id="uploadText" class="text-sm text-gray-600">
-                                    <span>Klik untuk upload file</span>
+                                    <span>Klik untuk upload gambar</span>
                                     <p class="text-xs mt-1">PNG, JPG, GIF hingga 5MB</p>
                                 </div>
                             </div>
                             <input id="foto" name="foto" type="file" class="sr-only" accept="image/*">
                         </div>
                         <div id="previewContainer" class="mt-4 hidden">
-                            <p class="text-sm text-gray-600 mb-2">Preview:</p>
-                            <div class="relative inline-block">
-                                <img id="previewImage" class="max-w-xs h-auto rounded-lg border border-gray-200">
-                                <button type="button" onclick="removeImage()" 
-                                        class="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full hover:bg-red-700">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
+                            <p class="text-sm text-gray-600 mb-2 text-center">Preview:</p>
+                            <div class="flex justify-center">
+                                <div class="relative inline-block">
+                                    <img id="previewImage" class="max-w-xs h-auto rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition" onclick="openPreviewModal()">
+                                    <button type="button" onclick="removeImage()" 
+                                            class="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full hover:bg-red-700">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                    <div class="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                                        Klik untuk memperbesar
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -178,6 +183,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ajukan_pengaduan'])) {
         </div>
     </div>
     
+    <!-- Image Preview Modal -->
+    <div id="previewModal" class="modal hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="modal-content bg-white rounded-xl shadow-xl max-w-4xl w-auto">
+            <div class="border-b border-gray-200 px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-900">Preview Foto</h3>
+                    <button onclick="closePreviewModal()" class="text-gray-400 hover:text-gray-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 flex justify-center">
+                <img id="modalPreviewImage" src="" alt="Preview Foto" class="max-w-full max-h-[70vh] h-auto rounded-lg">
+            </div>
+        </div>
+    </div>
+    
     <script src="assets/js/script.js?v=<?php echo time(); ?>"></script>
+    <script>
+        function openPreviewModal() {
+            const previewImage = document.getElementById('previewImage');
+            const modalImage = document.getElementById('modalPreviewImage');
+            modalImage.src = previewImage.src;
+            document.getElementById('previewModal').classList.remove('hidden');
+            document.getElementById('previewModal').classList.add('active');
+            document.body.classList.add('modal-open');
+            document.documentElement.classList.add('modal-open');
+        }
+        
+        function closePreviewModal() {
+            document.getElementById('previewModal').classList.add('hidden');
+            document.getElementById('previewModal').classList.remove('active');
+            document.body.classList.remove('modal-open');
+            document.documentElement.classList.remove('modal-open');
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('previewModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePreviewModal();
+            }
+        });
+    </script>
 </body>
 </html>

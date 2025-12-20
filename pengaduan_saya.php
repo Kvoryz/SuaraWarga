@@ -271,7 +271,7 @@ $pengaduan_list = array_reverse($pengaduan_list);
     </div>
     
     <div id="imageModal" class="modal hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
-        <div class="modal-content bg-white rounded-xl shadow-xl max-w-4xl w-full">
+        <div class="modal-content bg-white rounded-xl shadow-xl max-w-4xl w-auto">
             <div class="border-b border-gray-200 px-6 py-4">
                 <div class="flex justify-between items-center">
                     <h3 class="text-lg font-semibold text-gray-900">Foto Pengaduan</h3>
