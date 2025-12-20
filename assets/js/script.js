@@ -143,7 +143,8 @@ function openDetailModal(
   status,
   foto,
   lokasi,
-  tanggapanData
+  tanggapanData,
+  instansiData
 ) {
   const modal = document.getElementById("detailModal");
   if (!modal) return;
@@ -192,6 +193,29 @@ function openDetailModal(
     if (fotoContainer) fotoContainer.style.display = "block";
   } else {
     if (fotoContainer) fotoContainer.style.display = "none";
+  }
+
+  const instansiContainer = document.getElementById(
+    "detail_instansi_container"
+  );
+  const instansiList = document.getElementById("detail_instansi_list");
+
+  if (instansiList) instansiList.innerHTML = "";
+
+  if (instansiData && instansiData.length > 0) {
+    if (instansiContainer) instansiContainer.style.display = "block";
+
+    instansiData.forEach((inst) => {
+      const badge = document.createElement("span");
+      badge.className =
+        "inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-200";
+      badge.innerHTML = `<span class="mr-1">${inst.ikon || ""}</span>${
+        inst.nama
+      }`;
+      instansiList.appendChild(badge);
+    });
+  } else {
+    if (instansiContainer) instansiContainer.style.display = "none";
   }
 
   const tanggapanList = document.getElementById("detail_tanggapan_list");

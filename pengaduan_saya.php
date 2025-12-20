@@ -115,6 +115,16 @@ $pengaduan_list = array_reverse($pengaduan_list);
                                     ORDER BY t.tanggal_tanggapan DESC";
                 $result_tanggapan = mysqli_query($conn, $query_tanggapan);
                 $jumlah_tanggapan = mysqli_num_rows($result_tanggapan);
+                
+                $query_instansi = "SELECT i.nama_instansi, i.ikon 
+                                   FROM pengaduan_instansi pi 
+                                   JOIN instansi i ON pi.id_instansi = i.id_instansi 
+                                   WHERE pi.id_pengaduan = $id_pengaduan";
+                $result_instansi = mysqli_query($conn, $query_instansi);
+                $instansi_list = [];
+                while ($inst = mysqli_fetch_assoc($result_instansi)) {
+                    $instansi_list[] = $inst;
+                }
             ?>
             <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div class="border-b border-gray-200 px-6 py-4">
@@ -185,6 +195,25 @@ $pengaduan_list = array_reverse($pengaduan_list);
                              alt="Foto Pengaduan" 
                              class="max-w-md h-auto rounded-lg border border-gray-200 cursor-pointer mx-auto block"
                              onclick="openImageModal('<?php echo htmlspecialchars($pengaduan['foto']); ?>')">
+                    </div>
+                    <?php endif; ?>
+                    
+                    <?php if (count($instansi_list) > 0): ?>
+                    <div class="mb-4">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                            Ditangani oleh:
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                            <?php foreach ($instansi_list as $inst): ?>
+                            <span class="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-200">
+                                <span class="mr-1"><?php echo $inst['ikon']; ?></span>
+                                <?php echo htmlspecialchars($inst['nama_instansi']); ?>
+                            </span>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
                     <?php endif; ?>
                     

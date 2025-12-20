@@ -41,7 +41,7 @@ $output = fopen('php://output', 'w');
 
 fputs($output, $bom = (chr(0xEF) . chr(0xBB) . chr(0xBF)));
 
-fputcsv($output, array('No', 'ID', 'Tanggal', 'Pelapor', 'Email Pelapor', 'Isi Laporan', 'Lokasi', 'Status', 'Jumlah Tanggapan', 'Foto'));
+fputcsv($output, array('No', 'ID', 'Tanggal', 'Pelapor', 'Email Pelapor', 'Isi Laporan', 'Lokasi', 'Status', 'Instansi', 'Jumlah Tanggapan', 'Foto'));
 
 $no = 1;
 while ($row = mysqli_fetch_assoc($result)) {
@@ -65,6 +65,18 @@ while ($row = mysqli_fetch_assoc($result)) {
         $isi_laporan = substr($isi_laporan, 0, 200) . '...';
     }
     
+    $id_pengaduan = $row['id_pengaduan'];
+    $query_instansi = "SELECT i.nama_instansi 
+                       FROM pengaduan_instansi pi 
+                       JOIN instansi i ON pi.id_instansi = i.id_instansi 
+                       WHERE pi.id_pengaduan = $id_pengaduan";
+    $result_instansi = mysqli_query($conn, $query_instansi);
+    $instansi_names = [];
+    while ($inst = mysqli_fetch_assoc($result_instansi)) {
+        $instansi_names[] = $inst['nama_instansi'];
+    }
+    $instansi_text = count($instansi_names) > 0 ? implode(', ', $instansi_names) : '-';
+    
     fputcsv($output, array(
         $no++,
         $row['id_pengaduan'],
@@ -74,6 +86,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         $isi_laporan,
         $row['lokasi'] ?? '-',
         $status_text,
+        $instansi_text,
         $row['jumlah_tanggapan'],
         $row['foto'] ?: '-'
     ));

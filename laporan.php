@@ -26,6 +26,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['tambah_tanggapan'])) {
     $sql_status = "UPDATE pengaduan SET status = '$status' WHERE id_pengaduan = $id_pengaduan";
     
     if (mysqli_query($conn, $sql_status)) {
+        if (isset($_POST['instansi']) && is_array($_POST['instansi'])) {
+            mysqli_query($conn, "DELETE FROM pengaduan_instansi WHERE id_pengaduan = $id_pengaduan");
+            
+            foreach ($_POST['instansi'] as $id_instansi) {
+                $id_instansi = mysqli_real_escape_string($conn, $id_instansi);
+                $sql_instansi = "INSERT INTO pengaduan_instansi (id_pengaduan, id_instansi, id_petugas) 
+                                 VALUES ($id_pengaduan, $id_instansi, $user_id)";
+                mysqli_query($conn, $sql_instansi);
+            }
+        }
+        
         if (!empty($tanggapan)) {
             $sql_tanggapan = "INSERT INTO tanggapan (id_pengaduan, tanggal_tanggapan, tanggapan, id_petugas) 
                               VALUES ($id_pengaduan, '$tanggal_tanggapan', '$tanggapan', $user_id)";
@@ -125,6 +136,13 @@ $query_stats = "SELECT
 
 $stats_result = mysqli_query($conn, $query_stats);
 $stats = mysqli_fetch_assoc($stats_result);
+
+$query_instansi = "SELECT * FROM instansi ORDER BY nama_instansi ASC";
+$result_instansi = mysqli_query($conn, $query_instansi);
+$daftar_instansi = [];
+while ($inst = mysqli_fetch_assoc($result_instansi)) {
+    $daftar_instansi[] = $inst;
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -373,7 +391,6 @@ $stats = mysqli_fetch_assoc($stats_result);
                         <?php while ($row = mysqli_fetch_assoc($result)): 
                             $id_pengaduan = $row['id_pengaduan'];
                             
-                            // Ambil tanggapan terakhir untuk preview
                             $query_tanggapan = "SELECT t.*, u.nama as petugas_nama 
                                                 FROM tanggapan t 
                                                 JOIN users u ON t.id_petugas = u.id 
@@ -383,7 +400,6 @@ $stats = mysqli_fetch_assoc($stats_result);
                             $result_tanggapan = mysqli_query($conn, $query_tanggapan);
                             $tanggapan_terakhir = mysqli_fetch_assoc($result_tanggapan);
                             
-                            // Ambil semua tanggapan untuk modal detail
                             $query_all_tanggapan = "SELECT t.*, u.nama as petugas_nama, u.level as petugas_level 
                                                 FROM tanggapan t 
                                                 JOIN users u ON t.id_petugas = u.id 
@@ -401,6 +417,20 @@ $stats = mysqli_fetch_assoc($stats_result);
                                 ];
                             }
                             $tanggapan_json = htmlspecialchars(json_encode($all_tanggapan), ENT_QUOTES, 'UTF-8');
+                            
+                            $query_instansi_pengaduan = "SELECT i.nama_instansi, i.ikon 
+                                                         FROM pengaduan_instansi pi 
+                                                         JOIN instansi i ON pi.id_instansi = i.id_instansi 
+                                                         WHERE pi.id_pengaduan = $id_pengaduan";
+                            $result_instansi_pengaduan = mysqli_query($conn, $query_instansi_pengaduan);
+                            $instansi_list = [];
+                            while ($inst_row = mysqli_fetch_assoc($result_instansi_pengaduan)) {
+                                $instansi_list[] = [
+                                    'nama' => $inst_row['nama_instansi'],
+                                    'ikon' => $inst_row['ikon']
+                                ];
+                            }
+                            $instansi_json = htmlspecialchars(json_encode($instansi_list), ENT_QUOTES, 'UTF-8');
                         ?>
                         <tr>
                             <td class="px-4 py-4">
@@ -468,7 +498,8 @@ $stats = mysqli_fetch_assoc($stats_result);
                                     "<?php echo $row['status']; ?>",
                                     "<?php echo $row['foto'] ? addslashes($row['foto']) : ''; ?>",
                                     "<?php echo addslashes($row['lokasi'] ?? ''); ?>",
-                                    <?php echo $tanggapan_json; ?>
+                                    <?php echo $tanggapan_json; ?>,
+                                    <?php echo $instansi_json; ?>
                                 )' class="text-blue-600 hover:text-blue-900 mr-3">Detail</button>
                                 
                                 <button type="button" onclick="openTanggapanModal(<?php echo $row['id_pengaduan']; ?>, '<?php echo $row['status']; ?>')" 
@@ -581,6 +612,19 @@ $stats = mysqli_fetch_assoc($stats_result);
                     </div>
                 </div>
                 
+                <!-- Instansi Terkait -->
+                <div id="detail_instansi_container" class="mb-6" style="display: none;">
+                    <h4 class="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                        Instansi yang Menangani
+                    </h4>
+                    <div id="detail_instansi_list" class="flex flex-wrap gap-2">
+                        <!-- Instansi badges akan dimuat di sini via JavaScript -->
+                    </div>
+                </div>
+                
                 <!-- Riwayat Tanggapan -->
                 <div id="detail_tanggapan_container">
                     <h4 class="text-sm font-medium text-gray-700 mb-3 flex items-center">
@@ -636,8 +680,25 @@ $stats = mysqli_fetch_assoc($stats_result);
                     </div>
                     
                     <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Instansi Terkait (Opsional)</label>
+                        <div class="grid grid-cols-2 gap-2 p-3 border border-gray-200 rounded-lg bg-gray-50 max-h-48 overflow-y-auto">
+                            <?php foreach ($daftar_instansi as $inst): ?>
+                            <label class="flex items-center p-2 bg-white rounded-lg border border-gray-100 hover:border-blue-300 cursor-pointer transition">
+                                <input type="checkbox" name="instansi[]" value="<?php echo $inst['id_instansi']; ?>" 
+                                       class="instansi-checkbox w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <span class="ml-2 text-sm text-gray-700">
+                                    <span class="mr-1"><?php echo $inst['ikon']; ?></span>
+                                    <?php echo htmlspecialchars($inst['nama_instansi']); ?>
+                                </span>
+                            </label>
+                            <?php endforeach; ?>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Pilih instansi yang akan menangani pengaduan ini</p>
+                    </div>
+                    
+                    <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Tanggapan Anda (Opsional)</label>
-                        <textarea name="tanggapan" id="tanggapan_text" rows="6"
+                        <textarea name="tanggapan" id="tanggapan_text" rows="4"
                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"
                                   placeholder="Tuliskan tanggapan atau tindakan yang telah diambil (opsional)..."></textarea>
                     </div>
